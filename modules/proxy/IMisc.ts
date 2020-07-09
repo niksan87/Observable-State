@@ -1,7 +1,11 @@
 declare global {
 
     interface Object {
-        _propId: string;
+        _id: string;
+    }
+
+    interface Function {
+        equals: (fn: Function) => boolean;
     }
 }
 
@@ -13,10 +17,14 @@ export type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
-export type PathInside<T extends object> = keyof T;
+export type Dictionary<T> = {
+    [index: string]: T;
+}
+
+export type Primitive = String | Number | Boolean;
 
 export type Constructor<T extends {} = {}> = new (...args: any[]) => T;
 
-export type State = Object;
+export type Observer<T extends State = State> = (value?: T) => void;
 
-export type Observer<T> = (value: T) => void;
+export type State = Object;

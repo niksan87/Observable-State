@@ -3,6 +3,7 @@ import { ModelMutations } from 'modules/core/Model/ModelMutations';
 import { Model } from 'modules/core/Model/Model';
 import { DEFAULT_MODEL_DATA, MODIFIED_MODEL_DATA } from 'modules/core/Model/ModelConstants';
 import { Observer } from 'modules/proxy/IMisc';
+import './modules/proxy/Prototype';
 
 window.onload = () => {
     const model = new TestModel();
@@ -14,10 +15,10 @@ window.onload = () => {
     //model.case06();
     //model.case07();
     //model.case08();
-    // model.case09();
+    //model.case09();
     //model.case10();
-    //model.case11();
-    model.case12();
+    model.case11();
+    //model.case12();
 };
 
 class TestModel {
@@ -90,8 +91,9 @@ class TestModel {
 
     public case11(): void {
         this.model.bind(this.model.state.name, [this.onChange.bind(this), this.onChangeAnother.bind(this)]);
-        this.model.unbind(this.model.state.name, [this.onChange.bind(this)]);
+        this.model.unbind(this.model.state.name, [this.onChangeAnother]);
         this.model.mutate.NAME('Gogo');
+        this.model.mutate.NAME('Gogo1');
     }
 
     public case12(): void {
