@@ -38,7 +38,6 @@ class Test {
         
         this.store.mutate.STATE(modifiedData);
         console.log(this.store.state === modifiedData);
-        debugger;
 
     }
 
@@ -62,7 +61,6 @@ class Test {
         });
         //this.store.mutate.CODE(1111);
         
-        debugger;
     }
 
     private onChange(newValue: State, oldValue: State, propPath: string): void {

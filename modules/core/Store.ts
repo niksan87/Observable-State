@@ -17,11 +17,49 @@ export class Store {
     public get mutate(): Mutations {
         return this.mutations;
     }
-
+    
     public init(state: State, mutations: Constructor<Mutations>): void {
         this.mutations = new mutations(this.initState.bind(this));
         this.mutate.STATE(deepCopy(state));
         this.initReactivity(this, REACTIVE_PROP_NAME);
+    }
+
+    public bind(options: IBindOptions): void {
+
+        const propPath = `${REACTIVE_PROP_NAME}${options.propPath ? `.${options.propPath}` : ''}`;
+        const observers = typeof options.observer === 'function' ? [ options.observer ] : options.observer;
+        const recursive = options.recursive || false;
+
+        if(!this.observers[propPath]){
+            throw new Error(`Observer for '${propPath}' doesn't exist.`);
+        }
+
+        if(recursive) {
+            for (const id in this.observers) {
+                if(!id.includes(propPath)) continue;
+                this.observers[id].push(...observers);
+            }
+        } else {
+            this.observers[propPath].push(...observers);
+        }
+
+    }
+
+    public unbind(options: IBindOptions = {}): void {
+
+        const propPath = `${REACTIVE_PROP_NAME}${options.propPath ? `.${options.propPath}` : ''}`;
+        const observers = typeof options.observer === 'function' ? [ options.observer ] : options.observer;
+        const recursive = options.recursive || false;
+        
+        if(recursive) {
+            for (const id in this.observers) {
+                if(!id.includes(propPath)) continue;
+                this.observers[id] = this.filterObservers(id, observers);
+            }
+        } else {
+            this.observers[propPath] = this.filterObservers(propPath, observers);
+        }
+
     }
 
     private initState(value: State): State {
@@ -73,47 +111,9 @@ export class Store {
         });
     }
 
-    public bind(options: IBindOptions): void {
-
-        const propPath = `${REACTIVE_PROP_NAME}${options.propPath ? `.${options.propPath}` : ''}`;
-        const observers = typeof options.observer === 'function' ? [ options.observer ] : options.observer;
-        const recursive = options.recursive || false;
-
-        if(!this.observers[propPath]){
-            throw new Error(`Observer for '${propPath}' doesn't exist.`);
-        }
-
-        if(recursive) {
-            for (const id in this.observers) {
-                if(!id.includes(propPath)) continue;
-                this.observers[id].push(...observers);
-            }
-        } else {
-            this.observers[propPath].push(...observers);
-        }
-
-    }
-
-    public unbind(options: IBindOptions = {}): void {
-
-        const propPath = `${REACTIVE_PROP_NAME}${options.propPath ? `.${options.propPath}` : ''}`;
-        const observers = typeof options.observer === 'function' ? [ options.observer ] : options.observer;
-        const recursive = options.recursive || false;
-        const filterObservers = (id: string) => {
-            return !observers || observers.length === 0 ? [] : this.observers[id]
-                .filter(el => !this.observers[id].filter(observer => observers.some(currentObserver => observer.equals(currentObserver))).includes(el));
-        };
-        
-        if(recursive) {
-            for (const id in this.observers) {
-                if(!id.includes(propPath)) continue;
-
-                this.observers[id] = filterObservers(id);
-            }
-        } else {
-            this.observers[propPath] = filterObservers(propPath);
-        }
-
+    private filterObservers(id: string, observers: Observer[]): Observer[] {
+        return !observers || observers.length === 0 ? [] : this.observers[id]
+            .filter(el => !this.observers[id].filter(observer => observers.some(currentObserver => observer.equals(currentObserver))).includes(el));
     }
     
 }

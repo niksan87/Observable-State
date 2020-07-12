@@ -29,7 +29,7 @@ export type Observer<T extends State = State> = (newValue?: T, oldValue?: T, pro
 
 export type IBindOptions = {
     propPath?: string;
-    observer: Observer | Observer[];
+    observer?: Observer | Observer[];
     recursive?: boolean;
 
 }
