@@ -4,17 +4,6 @@ declare global {
     }
 }
 
-export type State = {
-    name: string;
-    age: number;
-    address: Address;
-}
-
-export type Address = {
-    code: number;
-    streetName: string;
-}
-
 export type Constructor<T extends {} = {}> = new (...args: any[]) => T;
 
 export type DeepReadonly<T> = {
@@ -25,11 +14,4 @@ export type Dictionary<T> = {
     [index: string]: T;
 }
 
-export type Observer<T extends State = State> = (newValue?: T, oldValue?: T, propPath?: string) => void;
-
-export type IBindOptions = {
-    propPath?: string;
-    observer?: Observer | Observer[];
-    recursive?: boolean;
-
-}
+export type Observer = (newValue?: any, oldValue?: any, propPath?: string) => void;
