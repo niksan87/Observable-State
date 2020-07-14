@@ -1,6 +1,6 @@
-import { State } from 'modules/core/state/IState';
+import { ModelState } from 'modules/model/IModel';
 
-export const DEFAULT_STATE: State = {
+export const DEFAULT_MODEL_STATE: ModelState = {
     name: 'John',
     age: 11,
     address: {
@@ -12,7 +12,7 @@ export const DEFAULT_STATE: State = {
     }
 };
 
-export const MODIFIED_STATE: State = {
+export const MODIFIED_MODEL_STATE: ModelState = {
     name: 'Jane',
     age: 22,
     address: {

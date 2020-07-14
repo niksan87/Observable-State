@@ -1,4 +1,4 @@
-export type State = {
+export type ModelState = {
     name: string;
     age: number;
     address: Address;

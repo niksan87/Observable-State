@@ -1,17 +1,7 @@
-import { State, Street, Address } from 'modules/core/state/IState';
+import { Mutations } from 'modules/store/Mutations';
+import { Address, Street, ModelState } from 'modules/model/IModel';
 
-export class Mutations<S extends State = State> {
-
-    protected state: S;
-    public initState: (value: S) => S;
-
-    public constructor(initState: (value: S) => S) {
-        this.initState = initState;
-    }
-
-    public STATE(value: S): void {
-        this.state = this.initState(value);
-    }
+export class ModelMutations<S extends ModelState = ModelState> extends Mutations<S> {
 
     public NAME(value: string): void {
         this.state.name = value;

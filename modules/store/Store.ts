@@ -1,7 +1,7 @@
+import { Mutations } from 'modules/store/Mutations';
+import { InitSettings, BindSettings } from 'modules/store/IStore';
 import { DeepReadonly, Dictionary, Observer } from 'modules/misc/IMisc';
-import { Mutations } from 'modules/core/mutations/Mutations';
-import { State } from 'modules/core/state/IState';
-import { InitSettings, BindSettings } from 'modules/core/store/IStore';
+import { State } from 'modules/store/State';
 
 const ROOT_PROP = '_state';
 
@@ -10,9 +10,11 @@ export class Store<S extends State, M extends Mutations<S>> {
     private _state: S;
     private mutations: M;
 
+    
+    private observers: Dictionary<Observer[]>;
+    private _initiated: boolean;
     private _reactive: boolean;
     private reactiveProps: string[];
-    private observers: Dictionary<Observer[]>
     
     public get state(): DeepReadonly<S> {
         return this._state;
@@ -22,21 +24,33 @@ export class Store<S extends State, M extends Mutations<S>> {
         return this.mutations;
     }
 
+    public get initiated(): boolean {
+        return this._initiated;
+    }
+
     public get reactive(): boolean {
         return this._reactive;
     }
 
     public init(settings: InitSettings<S, M>): void {
+        if(this._initiated) {
+            throw new Error(`You can't reinitiate '${this.constructor.name}'.`);
+        }
         this.mutations = new settings.mutations(this.initState.bind(this));
         this.mutate.STATE(settings.state);
         this._reactive = Array.isArray(settings.reactive) || settings.reactive;
-        this.reactiveProps = Array.isArray(settings.reactive) ? settings.reactive : [];
+        this.reactiveProps = Array.isArray(settings.reactive) ? settings.reactive : undefined;
+        this._initiated = true;
     }
 
     public bind(settings: BindSettings): void {
 
         if(!this.reactive) {
-            throw new Error(`Cannot un bind because '${this.constructor.name}' is not reactive. Initialise with different settings.`);
+            throw new Error(`Cannot use bind because '${this.constructor.name}' it's not reactive. You can change that in the settings passed to 'Store.init()'.`);
+        }
+
+        if(this.reactiveProps && !this.reactiveProps.includes(settings.prop)) {
+            throw new Error(`Can't bind property '${settings.prop}' because it's not reactive. You can change that in the settings passed to 'Store.init()'.`);
         }
 
         if(!this.observers){
@@ -70,7 +84,7 @@ export class Store<S extends State, M extends Mutations<S>> {
     public unbind(settings: BindSettings = {}): void {
 
         if(!this.reactive) {
-            throw new Error(`Cannot use unbind because '${this.constructor.name}' is not reactive. Initialise with different settings.`);
+            throw new Error(`Cannot use unbind because '${this.constructor.name}' it's not reactive. You can change that in the settings passed to 'Store.init()'.`);
         }
 
         if(!settings.prop) {
