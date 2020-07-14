@@ -81,19 +81,18 @@ export class Store<S extends State, M extends Mutations<S>> {
             settings.observer = [ settings.observer ];
         }
 
+        if(!settings.observer) {
+            settings.observer = [];
+        }
+
         if(settings.recursive) {
             for (const key in this.observers) {
                 if(key.includes(settings.prop)) {
-                    this.observers[key] = this.filterOutNonOccuring(this.observers[key], settings.observer);
+                    this.observers[key] = settings.observer.length === 0 ? [] : this.filterOutNonOccuring(this.observers[key], settings.observer);
                 }
             }
-        } else {
-
-            if(!this.observers[settings.prop]) {
-                throw new Error(`Cannot unbind observers for '${settings.prop}' because it doesn't exist.`);
-            }
-
-            this.observers[settings.prop] = this.filterOutNonOccuring(this.observers[settings.prop], settings.observer);
+        } else if(this.observers[settings.prop]) {
+            this.observers[settings.prop] = settings.observer.length === 0 ? [] : this.filterOutNonOccuring(this.observers[settings.prop], settings.observer);
         }
 
     }
@@ -104,7 +103,7 @@ export class Store<S extends State, M extends Mutations<S>> {
             this.observers[id] = [];
         }
 
-        // Todo: Filter out existing observers from the ones to be added
+        observers = this.filterOutNonOccuring(observers, this.observers[id]);
         this.observers[id].push(...observers);
 
         let propValue = target[propName];
@@ -132,7 +131,7 @@ export class Store<S extends State, M extends Mutations<S>> {
     }
 
     private filterOutNonOccuring(a: Observer[], b: Observer[]): Observer[] {
-        return !b || b.length === 0 ? [] : a.filter(i => !a.filter(k => b.some(j => k.equals(j))).includes(i));
+        return !b || b.length === 0 ? a : a.filter(i => !a.filter(k => b.some(j => k.equals(j))).includes(i));
     }
 
 

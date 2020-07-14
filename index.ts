@@ -8,7 +8,8 @@ import { Observer } from 'modules/misc/IMisc';
 window.onload = () => {
 
     const test = new Test();
-    test.init();    
+    test.init();
+    //test.test();  
 
 };
 
@@ -23,12 +24,14 @@ class Test {
         });
 
         store.bind({
-            observer: this.onChange.bind(this),
+            prop: 'address',
+            observer: [this.onChange.bind(this), this.onChange2.bind(this), this.onChange3.bind(this)],
             recursive: true
         });
 
-        store.bind({
-            observer: this.onChange.bind(this),
+        store.unbind({
+            prop: 'address.street',
+            observer: [this.onChange, this.onChange3],
             recursive: true
         });
 
