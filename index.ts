@@ -477,7 +477,7 @@ class ViewModelTest {
         const cmk = getCMK();
         this.view.init({
             state: cmk,
-            reactive: ['renderable']
+            reactive: ['renderable'] // false, true
         });
         this.viewModel = new ViewModel();
         this.viewModel.init({
@@ -492,10 +492,10 @@ class ViewModelTest {
             observer: this.onChange.bind(this)
         });
 
-        this.viewModel.view.get('background').bind({
-            prop: 'alpha',
-            observer: this.onChange2.bind(this)
-        });
+        // this.viewModel.view.get('background').bind({
+        //     prop: 'alpha',
+        //     observer: this.onChange2.bind(this)
+        // });
 
         setTimeout(() => {
             this.viewModel.model.mutate.AGE(17);
@@ -504,7 +504,7 @@ class ViewModelTest {
     }
 
     private onChange(newValue: any, oldValue: any, propPath: string): void {
-        this.view.get('background').mutate.ALPHA(0.8);
+        this.view.get('background').mutate.SCALE(0.5);
         this.view.get('background').mutate.RENDERABLE(false);
         this.view.get<PIXI.Text, TextMutations>('text').mutate.TEXT('some text');
     }
