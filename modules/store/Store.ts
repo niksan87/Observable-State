@@ -1,19 +1,18 @@
 import { Mutations } from 'modules/store/Mutations';
 import { InitSettings, BindSettings } from 'modules/store/IStore';
-import { DeepReadonly, Dictionary, Observer } from 'modules/misc/IMisc';
+import { DeepReadonly, Dictionary, Observer, Indexable } from 'modules/misc/IMisc';
 import { State } from 'modules/store/State';
 
 const ROOT_PROP = '_state';
 
 export class Store<S extends State, M extends Mutations<S>> {
 
-    private _state: S;
-    private mutations: M;
-
+    protected _state: S;
+    protected mutations: M;
     
     private observers: Dictionary<Observer[]>;
-    private _initiated: boolean;
-    private _reactive: boolean;
+    private initiated: boolean;
+    private reactive: boolean;
     private reactiveProps: string[];
     
     public get state(): DeepReadonly<S> {
@@ -24,23 +23,16 @@ export class Store<S extends State, M extends Mutations<S>> {
         return this.mutations;
     }
 
-    public get initiated(): boolean {
-        return this._initiated;
-    }
-
-    public get reactive(): boolean {
-        return this._reactive;
-    }
-
     public init(settings: InitSettings<S, M>): void {
-        if(this._initiated) {
+        if(this.initiated) {
             throw new Error(`You can't reinitiate '${this.constructor.name}'.`);
         }
         this.mutations = new settings.mutations(this.initState.bind(this));
         this.mutate.STATE(settings.state);
-        this._reactive = Array.isArray(settings.reactive) || settings.reactive;
+        this.reactive = Array.isArray(settings.reactive) || settings.reactive;
         this.reactiveProps = Array.isArray(settings.reactive) ? settings.reactive : undefined;
-        this._initiated = true;
+        this.initiated = true;
+
     }
 
     public bind(settings: BindSettings): void {
@@ -111,6 +103,10 @@ export class Store<S extends State, M extends Mutations<S>> {
 
     }
 
+    public notify(id: string, newValue?: any, oldValue?: any): void {
+        this.observers[id].forEach((observe) => observe(newValue, oldValue, id));
+    }
+
     private initProp(target: Object, propName: string, id: string, observers: Observer[]): void {
 
         if (!this.observers[id]) {
@@ -130,7 +126,7 @@ export class Store<S extends State, M extends Mutations<S>> {
                 }
                 const oldValue = propValue;
                 propValue = newValue;
-                this.observers[id].forEach((observe) => observe(propValue, oldValue, id));
+                this.notify(id, propValue, oldValue);
             },
         });
     }
@@ -152,6 +148,25 @@ export class Store<S extends State, M extends Mutations<S>> {
     private initState(value: S): S {
         this._state = value;
         return this._state;
+    }
+
+    private filterOutProperties(object: Object): Object {
+
+        const output = {};
+
+        for (const key in object) {
+            if(typeof object[key] === 'function') {
+                continue;
+            }
+
+            if(typeof object[key] === 'object') {
+                output[key] = this.filterOutProperties(object[key]);
+            } else {
+                output[key] = object[key];
+            }
+        }
+
+        return output;
     }
 
 }

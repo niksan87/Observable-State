@@ -10,6 +10,6 @@ export type Address = {
 }
 
 export type Street = {
-    name: string;
+    name: string[];
     number: number;
 }

@@ -297,7 +297,15 @@ export class ContainerMutations<S extends PIXI.Container = PIXI.Container> exten
 
 }
 
-export class SpriteState<S extends PIXI.Sprite = PIXI.Sprite> extends ContainerMutations<S> {
+export class GraphicsMutations<S extends PIXI.Graphics = PIXI.Graphics> extends ContainerMutations<S> {
+
+    public TINT(value: number): void {
+        this.state.tint = value;
+    }
+
+}
+
+export class SpriteMutations<S extends PIXI.Sprite = PIXI.Sprite> extends ContainerMutations<S> {
 
     /**
      * A mutation that updates the anchor.
@@ -372,7 +380,7 @@ export class SpriteState<S extends PIXI.Sprite = PIXI.Sprite> extends ContainerM
 
 }
 
-export class TilingSpriteState<S extends PIXI.TilingSprite = PIXI.TilingSprite> extends SpriteState<S> {
+export class TilingSpriteMutations<S extends PIXI.TilingSprite = PIXI.TilingSprite> extends SpriteMutations<S> {
 
     /**
      * A mutation that updates the tint.
@@ -458,11 +466,18 @@ export class TilingSpriteState<S extends PIXI.TilingSprite = PIXI.TilingSprite> 
 
 }
 
-
-export class TextMutations<S extends PIXI.Text = PIXI.Text> extends ContainerMutations<S> {
+export class TextMutations<S extends PIXI.Text = PIXI.Text> extends SpriteMutations<S> {
 
     public TEXT(value: string): void {
         this.state.text = value;
+    }
+
+    public STYLE(value: PIXI.TextStyle): void {
+        this.state.style = value;
+    }
+
+    public RESOLUTION(value: number): void {
+        this.state.resolution = value;
     }
 
 }

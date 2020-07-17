@@ -19,7 +19,7 @@ export class ModelMutations<S extends ModelState = ModelState> extends Mutations
         this.state.address.street = value;
     }
 
-    public ADDRESS_STREET_NAME(value: string): void {
+    public ADDRESS_STREET_NAME(value: string[]): void {
         this.state.address.street.name = value;
     }
 

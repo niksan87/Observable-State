@@ -5,7 +5,7 @@ export const DEFAULT_MODEL_STATE: ModelState = {
     age: 11,
     address: {
         street: {
-            name: 'John street',
+            name: ['John', 'street'],
             number: 111
         },
         code: 1111
@@ -17,7 +17,7 @@ export const MODIFIED_MODEL_STATE: ModelState = {
     age: 22,
     address: {
         street: {
-            name: 'Jane street',
+            name: ['Jane', 'street'],
             number: 222
         },
         code: 2222
